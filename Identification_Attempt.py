@@ -169,6 +169,7 @@ else:
                 if duplicates > max:
                     #look at the SA and remove if not existent
                     #if two consecutive dont match, remove
+                    #yes - sainirnay
                     matches = []
                     matchNotes = []
                     matches.append(ragas)
