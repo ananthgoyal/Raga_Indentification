@@ -144,11 +144,9 @@ matchNotes = []
 if len(input_notes) == 7:
     for x in input_notes:
         input_notes = input_notes[1:] + input_notes[:1]
-        #print("notes" + str(input_notes))
         for i in range(0, len(input_notes)-1):
             input_diff.append(difference(input_notes[i+1], input_notes[i]))
         input_diff.append(difference(input_notes[0], input_notes[len(input_notes)-1]))
-        #print("diff" + str(input_diff))
         for ragas in melaScheme:
             if input_diff == ragas.notes:
                 matches.append(ragas)
@@ -167,10 +165,10 @@ else:
         for ragas in melaScheme:
             while count <= 6.5:
                 ragNotes = reverseMap(ragas.notes, count)
-                #print(ragNotes)
                 duplicates = len(set(ragNotes) & set(input_notes))
-                #print(duplicates)
                 if duplicates > max:
+                    #look at the SA and remove if not existent
+                    #if two consecutive dont match, remove
                     matches = []
                     matchNotes = []
                     matches.append(ragas)
