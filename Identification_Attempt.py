@@ -46,7 +46,7 @@ def identification():
     #main algorithm TBD
     pass
 
-def reverseMap(differences, start):
+""" def reverseMap(differences, start):
     map = []
     map.append(start)
     for i in range(1, len(differences)):
@@ -55,7 +55,32 @@ def reverseMap(differences, start):
         else:
             map.append(differences[i] + 0.5)
 
+    return map """
+
+#Re-did this method a little bit
+def reverseMap(differences, start):
+    map = []
+    map.append(start)
+    for i in range(1, len(differences)):
+        note = map[i - 1] + differences[i - 1]
+        if (note >= 7):
+            note = note % 7 + 1
+        map.append(note)
     return map
+
+def difCheck(inputRag, rag, ragInt):
+
+    #Checking R and G and making sure lower/higher versions can not appear without complement
+    if (ragInt.notes[0] + ragInt.notes[1] == 1) and (not(rag[1] in inputRag)):
+        return False
+    if (ragInt.notes[0] == 1.5) and (not(rag[2] in inputRag)):
+        return False
+    #Checking D and N and making sure lower/higher versions can not appear without complement
+    if (ragInt.notes[4] + ragInt.notes[5] == 1) and (not(rag[5] in inputRag)):
+        return False
+    if (ragInt.notes[4] == 1.5) and (not(rag[6] in inputRag)):
+        return False
+    return True
 
 melaScheme = []
 posMela = []
@@ -135,6 +160,7 @@ melaScheme.append(Raga(72,[1.5,0.5,1,0.5,1.5,0.5,0.5]))
 
 
 input_notes = [1, 2, 3, 4.5, 6.5]
+#input_notes = [1, 2.5, 3.5, 5, 6]
 input_notes.sort()
 input_diff = []
 matches = []
@@ -157,29 +183,37 @@ if len(input_notes) == 7:
     for i in range (0, len(matches)):
         print("Difference " + str(matches[i].notes) + " | Notes: " + str(matchNotes[i]) + " | Raga Number: " + str(matches[i].num))
 else:
+    print(input_notes)
     for x in input_notes:
         input_notes = input_notes[1:] + input_notes[:1]
-        count = 1
-        max = 0
-        matches = []
+
+        #Instead of looping through all scales for each raga, as we rotate through input notes, we can just set the scale to the note in the SA position
+        count = input_notes[0]
+
+        max = len(input_notes)
         for ragas in melaScheme:
-            while count <= 6.5:
-                ragNotes = reverseMap(ragas.notes, count)
-                duplicates = len(set(ragNotes) & set(input_notes))
-                if duplicates > max:
-                    #look at the SA and remove if not existent
+            ragNotes = reverseMap(ragas.notes, count)
+            duplicates = len(set(ragNotes) & set(input_notes))
+            if duplicates == max:
+                gap = 0
+                inIndex = 1
+                #look at the SA and remove if not existent
+                if input_notes[0] == ragNotes[0]:
                     #if two consecutive dont match, remove
-                    #yes - sainirnay
-                    matches = []
-                    matchNotes = []
-                    matches.append(ragas)
-                    matchNotes.append(ragNotes)
-                    max = duplicates
-                elif duplicates == max:
-                    matches.append(ragas)
-                    matchNotes.append(ragNotes)
-                count += 0.5
-            count = 0
+                    for i in range(1, len(ragNotes),1):
+                        if (input_notes[inIndex] != ragNotes[i]):
+                            inIndex -= 1
+                            gap -= 1
+                            if(gap == -2):
+                                break
+                        else:
+                            gap = 0
+                        inIndex += 1
+                        if (inIndex == len(input_notes)):
+                            break
+                    if gap > -2 and difCheck(input_notes,ragNotes,ragas):
+                        matches.append(ragas)
+                        matchNotes.append(ragNotes)
     print("Number of Matches Found: " + str(len(matches)))
     for i in range(0, len(matches)):
         print("Difference " + str(matches[i].notes) + " | Notes: " + str(matchNotes[i]) + " | Raga Number: " + str(
